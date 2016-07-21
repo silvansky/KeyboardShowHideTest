@@ -70,6 +70,17 @@
 {
 	self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(tick:)];
 	[self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+
+	self.heightConstraint.constant = 44;
+
+	[self.view setNeedsUpdateConstraints];
+
+	NSTimeInterval duration = [notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
+
+	NSInteger opts = [notification.userInfo[UIKeyboardAnimationCurveUserInfoKey] integerValue];
+	[UIView animateWithDuration:duration delay:0.f options:opts << 16 animations:^{
+		[self.view layoutIfNeeded];
+	} completion:NULL];
 }
 
 - (void)keyboardDidShow:(NSNotification *)notification
@@ -81,6 +92,17 @@
 {
 	self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(tick:)];
 	[self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+
+	self.heightConstraint.constant = 60;
+
+	[self.view setNeedsUpdateConstraints];
+
+	NSTimeInterval duration = [notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
+
+	NSInteger opts = [notification.userInfo[UIKeyboardAnimationCurveUserInfoKey] integerValue];
+	[UIView animateWithDuration:duration delay:0.f options:opts << 16 animations:^{
+		[self.view layoutIfNeeded];
+	} completion:NULL];
 }
 
 - (void)keyboardDidHide:(NSNotification *)notification
