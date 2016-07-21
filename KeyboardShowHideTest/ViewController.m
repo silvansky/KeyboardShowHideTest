@@ -47,7 +47,7 @@
 
 	[self.view setNeedsUpdateConstraints];
 
-	NSTimeInterval duration = [notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue] * 0.9f;
+	NSTimeInterval duration = [notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
 
 	NSInteger opts = [notification.userInfo[UIKeyboardAnimationCurveUserInfoKey] integerValue];
 	[UIView animateWithDuration:duration delay:0.f options:opts << 16 animations:^{
@@ -67,7 +67,7 @@
 
 	[self.view setNeedsUpdateConstraints];
 
-	NSTimeInterval duration = [notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue] * 0.9f;
+	NSTimeInterval duration = [notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
 
 	NSInteger opts = [notification.userInfo[UIKeyboardAnimationCurveUserInfoKey] integerValue];
 	[UIView animateWithDuration:duration delay:0.f options:opts << 16 animations:^{
