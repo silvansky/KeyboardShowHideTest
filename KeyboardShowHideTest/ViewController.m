@@ -15,13 +15,17 @@
 @property (weak, nonatomic) IBOutlet UITextField *textField;
 @property (weak, nonatomic) IBOutlet UIButton *cancelButton;
 
+@property (nonatomic, strong) CADisplayLink *displayLink;
+
 @end
 
 @implementation ViewController
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
+
+	self.textField.inputAccessoryView = [UIView new];
+
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
@@ -37,47 +41,51 @@
 	[self.textField resignFirstResponder];
 }
 
+- (void)dealloc
+{
+	[[NSNotificationCenter defaultCenter] removeObserver: self];
+}
+
+#pragma mark - CADisplayLink Tick
+
+- (void)tick:(CADisplayLink *)displayLink
+{
+	CGRect r = [self.textField.inputAccessoryView.superview.layer.presentationLayer frame];
+	r = [self.view convertRect:r fromView:_textField.inputAccessoryView.superview.superview];
+
+	CGFloat fromBottom = self.view.bounds.size.height - r.origin.y;
+	if (fromBottom > 44)
+	{
+		self.bottomConstraint.constant = fromBottom;
+	}
+	else
+	{
+		self.bottomConstraint.constant = 44;
+	}
+}
+
 #pragma mark - Keyboard Notifications
 
 - (void)keyboardWillShow:(NSNotification *)notification
 {
-	CGFloat keyboardHeight = [notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue].size.height;
-	self.bottomConstraint.constant = keyboardHeight;
-	self.heightConstraint.constant = 44;
-
-	[self.view setNeedsUpdateConstraints];
-
-	NSTimeInterval duration = [notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
-
-	NSInteger opts = [notification.userInfo[UIKeyboardAnimationCurveUserInfoKey] integerValue];
-	[UIView animateWithDuration:duration delay:0.f options:opts << 16 animations:^{
-		[self.view layoutIfNeeded];
-	} completion:NULL];
-
+	self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(tick:)];
+	[self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
 }
 
 - (void)keyboardDidShow:(NSNotification *)notification
 {
+	[self.displayLink removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
 }
 
 - (void)keyboardWillHide:(NSNotification *)notification
 {
-	self.bottomConstraint.constant = 44;
-	self.heightConstraint.constant = 60;
-
-	[self.view setNeedsUpdateConstraints];
-
-	NSTimeInterval duration = [notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
-
-	NSInteger opts = [notification.userInfo[UIKeyboardAnimationCurveUserInfoKey] integerValue];
-	[UIView animateWithDuration:duration delay:0.f options:opts << 16 animations:^{
-		[self.view layoutIfNeeded];
-	} completion:NULL];
-
+	self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(tick:)];
+	[self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
 }
 
 - (void)keyboardDidHide:(NSNotification *)notification
 {
+	[self.displayLink removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
 }
 
 @end
